@@ -13,14 +13,14 @@ use Getopt::Long;
 # Author: Xiao-Tai Huang
 # Email: xthuang226@gmail.com
 # Version: 2.0
-# Date: 2017/12/05
+# Date: 2017/12/20
 #
 
 
 my $file        = "Draw_cell_lineage_tree.pl";
 my $program     = uc($&) if $file =~ /^\w+/;
 my $version     = "2.0";
-my $date        = "2017/12/05";
+my $date        = "2017/12/20";
 my $author      = "Xiao-Tai Huang";
 
 
@@ -56,7 +56,8 @@ $::opt_titlelabel    = 1;
 $::opt_axis          = 0;
 $::opt_brand         = 0;
 $::opt_autozoom      = 0;
-$::opt_mixtree    = 1;
+$::opt_revc          = 0;
+$::opt_mixtree       = 1;
 $::opt_indb          = 'data/cdfiles.db3';
 $::opt_output        = 'results/';
 
@@ -92,7 +93,8 @@ Options:                                                               (defaults
   --axis             draw axis for the tree                            ($bool[$::opt_axis])
   --brand            draw brand for the tree                           ($bool[$::opt_brand])
   --autozoom         autozoom graph with window size                   ($bool[$::opt_autozoom])
-  --mixtree       draw merged tree with multiple marker expressions ($bool[$::opt_mixtree])
+  --revc             reverse the color when drawing two CD files       ($bool[$::opt_revc])
+  --mixtree          draw merged tree with multiple marker expressions ($bool[$::opt_mixtree])
 Examples:
   \L$program\E CD130826PHA4p2
   \L$program\E CD130826PHA4p2 --root ABara --cellstage 350 --autozoom
@@ -129,6 +131,7 @@ GetOptions(
   "axis!",
   "brand!",
   "autozoom!",
+  "revc!",
   "mixtree!",
   "indb=s",
   "output=s"
@@ -142,7 +145,7 @@ my $origin = 'P0';
 my @tables = @ARGV;
 my ($root, $endtime, $cellstage, $indb, $output) = ($::opt_root, $::opt_endtime, $::opt_cellstage, $::opt_indb, $::opt_output);
 die $usage unless defined $tables[0];
-my ($binary, $model, $cutoff, $autozoom, $mixtree) = ($::opt_binary, $::opt_model, $::opt_cutoff, $::opt_autozoom, $::opt_mixtree);
+my ($binary, $model, $cutoff, $autozoom, $revc, $mixtree) = ($::opt_binary, $::opt_model, $::opt_cutoff, $::opt_autozoom, $::opt_revc, $::opt_mixtree);
 my ($label, $bottom_label, $axis, $brand, $titlelabel) = ($::opt_label, $::opt_bottomlabel, $::opt_axis, $::opt_brand, $::opt_titlelabel);
 my ($width, $height, $linewidth, $lineinter, $scale) = ($::opt_width, $::opt_height, $::opt_linewidth, $::opt_lineinter, $::opt_scale);
 my ($lefontsize, $lafontsize, $blafontsize, $axfontsize, $brfontsize, $titlefontsize) = ($::opt_lefontsize, $::opt_lafontsize, $::opt_blafontsize, $::opt_axfontsize, $::opt_brfontsize, $::opt_titlefontsize);
@@ -261,7 +264,8 @@ my $outpath = "$output/$outfilename\_$root\_tp$endtime\_c$leafnumb_ALL[0].svg";
 
 
 ### Set colors
-my @linecolors_set = split(/\|/, "rgb(200, 0, 0)|rgb(0, 200, 0)|rgb(33, 148, 35)");
+my @linecolors_set = split(/\|/, "rgb(200, 0, 0)|rgb(0, 200, 0)");
+@linecolors_set = split(/\|/, "rgb(0, 200, 0)|rgb(200, 0, 0)") if $revc == 1;
 my @labelcolors_set = split(/\|/, "rgb(160, 160, 160)|black");
 
 
